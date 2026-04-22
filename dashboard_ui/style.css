@@ -1,0 +1,126 @@
+:root {
+    --bg-dark: #02050a;
+    --glass-bg: rgba(10, 15, 30, 0.6);
+    --glass-border: rgba(0, 243, 255, 0.15);
+    --cyan: #00f3ff;
+    --danger: #ff003c;
+    --text-main: #e0e6ed;
+    --font-ui: 'Rajdhani', sans-serif;
+    --font-data: 'Share Tech Mono', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    font-family: var(--font-ui);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background-image: radial-gradient(circle at 50% 0%, #0a1128 0%, var(--bg-dark) 80%);
+}
+
+.glass-panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+}
+
+/* Header */
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px;
+    margin: 10px;
+    z-index: 10;
+}
+
+.brand { font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+.brand-sub { font-size: 0.9rem; color: #557; letter-spacing: 2px; }
+.logo-pulse { width: 10px; height: 10px; background: var(--cyan); border-radius: 50%; box-shadow: 0 0 10px var(--cyan); animation: pulse 2s infinite; }
+
+.system-vitals { display: flex; gap: 20px; font-family: var(--font-data); font-size: 0.9rem; display: none; } /* Hidden on mobile */
+.text-cyan { color: var(--cyan); text-shadow: 0 0 5px rgba(0, 243, 255, 0.5); }
+
+.status { font-family: var(--font-data); font-size: 0.95rem; }
+.status-ok { color: var(--cyan); font-weight: bold; margin-right: 15px; }
+.mission-time { background: rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 4px; }
+
+/* Dashboard Layout */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 15px;
+    padding: 0 10px 10px 10px;
+    flex-grow: 1;
+    min-height: 0;
+}
+
+.panel {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+}
+
+.side-panels {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Panel Headers */
+.panel-header {
+    background: linear-gradient(90deg, rgba(0, 243, 255, 0.1) 0%, transparent 100%);
+    padding: 8px 15px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.badge { background: var(--cyan); color: #000; padding: 2px 6px; font-size: 0.7rem; font-weight: bold; border-radius: 3px; }
+.ping-dot { width: 6px; height: 6px; background: var(--cyan); border-radius: 50%; animation: blink 1s infinite; }
+
+/* 3D View */
+.main-view { height: 100%; }
+#globe-container { flex-grow: 1; width: 100%; position: relative; cursor: crosshair; }
+.overlay-data { position: absolute; bottom: 15px; left: 15px; font-family: var(--font-data); color: var(--cyan); font-size: 0.85rem; opacity: 0.8; }
+
+/* 2D View */
+.tracking-view { height: 40%; }
+.map-container { flex-grow: 1; width: 100%; position: relative; }
+canvas#map-2d { width: 100%; height: 100%; display: block; }
+
+/* Telemetry View */
+.log-view { height: 60%; }
+.telemetry-log { flex-grow: 1; padding: 10px; font-family: var(--font-data); font-size: 0.8rem; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+.log-entry { background: rgba(0,0,0,0.4); padding: 6px 10px; border-left: 2px solid var(--cyan); color: #a0b0c0; }
+.log-entry strong { color: var(--text-main); }
+.log-critical { border-left-color: var(--danger); background: rgba(255, 0, 60, 0.1); color: #ff88a0; }
+
+/* Animations */
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(0, 243, 255, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(0, 243, 255, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 243, 255, 0); } }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+/* RESPONSIVE DESIGN (HP & Tablet) */
+@media (min-width: 768px) {
+    .system-vitals { display: flex; }
+}
+
+@media (max-width: 900px) {
+    body { overflow-y: auto; display: block; }
+    .dashboard-grid { grid-template-columns: 1fr; display: flex; flex-direction: column; }
+    .main-view { height: 50vh; min-height: 400px; }
+    .tracking-view { height: 30vh; min-height: 250px; }
+    .log-view { height: 40vh; min-height: 300px; }
+}

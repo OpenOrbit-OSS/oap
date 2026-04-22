@@ -1,0 +1,34 @@
+# OAP/Cargo.toml
+
+[package]
+name = "oap"
+version = "1.0.0"
+edition = "2021"
+authors = ["OpenOrbit"]
+description = "Autonomous Satellite Collision Avoidance System"
+license = "Apache-2.0"
+publish = false # IMPORTANT: Prevents accidental upload to public crates.io
+
+# -----------------------------------------------------------------------------
+# DEPENDENCIES
+# -----------------------------------------------------------------------------
+[dependencies]
+# We strictly rely on the Rust Standard Library for the core physics engine
+# to guarantee zero-cost abstractions, memory safety, and minimal binary size.
+
+# -----------------------------------------------------------------------------
+# COMPILER OPTIMIZATIONS FOR AEROSPACE HARDWARE (OBC)
+# -----------------------------------------------------------------------------
+
+# Development profile (Used during 'cargo test' and 'cargo build')
+[profile.dev]
+opt-level = 0
+debug = true
+
+# Production profile (Used during 'cargo build --release' for actual satellite deployment)
+[profile.release]
+opt-level = 3          # Maximize CPU execution speed
+lto = true             # Link Time Optimization: removes dead code across modules
+codegen-units = 1      # Compiles as a single unit for maximum optimization
+panic = "abort"        # If a fatal error occurs, abort immediately to save memory (No stack unwinding)
+strip = true           # Strip symbols from binary to drastically reduce file size

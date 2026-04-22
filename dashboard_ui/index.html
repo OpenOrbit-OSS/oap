@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>OAP | Sovereign Command Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+    <div class="background-fx"></div>
+    <header class="top-bar glass-panel">
+        <div class="brand">
+            <div class="logo-pulse"></div>
+            OAP <span class="brand-sub">// ORBITAL ANALYSIS PRO</span>
+        </div>
+        <div class="system-vitals">
+            <div class="vital-item">CPU: <span class="text-cyan">12%</span></div>
+            <div class="vital-item">DELTA-V: <span class="text-cyan">840 m/s</span></div>
+        </div>
+        <div class="status">STATUS: <span class="status-ok glow-text">NOMINAL</span> <span class="mission-time" id="mission-time">T+ 00:00:00</span></div>
+    </header>
+
+    <main class="dashboard-grid">
+        <section class="panel glass-panel main-view">
+            <div class="panel-header">
+                <span><i class="icon">⚲</i> 3D ORBITAL SPACE-TRACK</span>
+                <span class="badge">LIVE (GEO)</span>
+            </div>
+            <div id="globe-container"></div>
+            <div class="overlay-data">
+                <div>ALT: 35,786 KM</div>
+                <div>INC: 0.00°</div>
+            </div>
+        </section>
+
+        <div class="side-panels">
+            <section class="panel glass-panel tracking-view">
+                <div class="panel-header">
+                    <span><i class="icon">⌖</i> EQUATORIAL RADAR</span>
+                </div>
+                <div class="map-container" id="map-container">
+                    <canvas id="map-2d"></canvas>
+                </div>
+            </section>
+            
+            <section class="panel glass-panel log-view">
+                <div class="panel-header">
+                    <span><i class="icon">≡</i> OAP TELEMETRY STREAM</span>
+                    <div class="ping-dot"></div>
+                </div>
+                <div class="telemetry-log" id="telemetry-log"></div>
+            </section>
+        </div>
+    </main>
+
+    <script src="map_2d_tracker.js"></script>
+    <script src="globe_3d_render.js"></script>
+</body>
+</html>
