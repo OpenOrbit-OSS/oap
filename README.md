@@ -44,16 +44,7 @@ cargo test --test coordination_test
 cargo run --release
 ```
 
-## 6. Licensing and Commercial Tiers
-OAP Technical Group believes that **Orbital Safety is a Universal Right, not a Premium Feature**. Therefore, the core cryptographic engine, collision algorithms, and aerospace physics capabilities are **100% identical and uncompromised across all tiers**.
-
-Pricing is determined strictly by the level of **Dedicated Support, SLA (Service Level Agreement), and Custom Hardware Integration** required by the client:
-* **Government & Enterprise (Tier 1 - IDR 500,000,000/Year)**: Including 24/7 dedicated support for critical missions, and direct communication between technicians.
-* **SpaceTech Startups (Tier 2 - IDR 100,000,000/Year)**: Includes standard business-hours integration support and architectural review for micro-satellite deployment.
-* **Academic & Research (Tier 3 - IDR 10,000,000/Year)**: Self-managed license for university laboratories. Support provided via official documentation only.
-* **Future Leaders Program (Tier 4 - FREE)**: Full-featured perpetual license granted exclusively to selected Indonesian prodigies and independent talents to foster national technological sovereignty. Community-supported.
-
-## 7. Licensing
+## 6. Licensing
 
 This project is licensed under the **Apache License, Version 2.0** (the "License").
 You may obtain a copy of the License at:
