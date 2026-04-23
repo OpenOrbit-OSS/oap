@@ -7,6 +7,7 @@ use std::time::{Duration, Instant};
 use oap::collision::coordination::{negotiate_evasion, OapCryptoCore, TargetIdentity};
 use oap::collision::evasive_action::compute_evasion_maneuver;
 use oap::collision::radar_scanner::{ObjectClass, RadarFilter, SpaceObject};
+use oap::collision::recovery::{compute_recovery_maneuver, RecoveryConfig};
 use oap::collision::threat_eval::{assess_threat, ThreatLevel};
 use oap::engine::gravity_model::calculate_j2_perturbation;
 use oap::engine::orbital_mechanics::{OrbitalState, Vector3, EARTH_RADIUS};
@@ -21,13 +22,13 @@ fn main() {
     panic::set_hook(Box::new(|info| {
         eprintln!("\n[CRITICAL FAIL] OAP System Anomaly Detected!");
         eprintln!("Detail Error: {:?}", info);
-        eprintln!("[AUTO-RECOVERY] Mengaktifkan Mode Darurat & Transmisi SOS ke Stasiun Bumi...");
+        eprintln!("[AUTO-RECOVERY Activate Emergency Mode & SOS Transmission to Ground Station...");
         oap::telemetry::transmitter::send_sos();
     }));
 
     println!("==================================================");
     println!(" OAP (Orbital Analysis Pro) - KERNEL INITIALIZED");
-    println!(" VERSION: 1.0 (SOVEREIGN COMMAND EDITION)");
+    println!(" VERSION: 1.1.0 (SOVEREIGN COMMAND EDITION)");
     println!("==================================================");
 
     // 2. BOOTING SEQUENCE & STATE INITIALIZATION
@@ -44,6 +45,12 @@ fn main() {
             z: 0.0,
         },
     };
+
+    let mut reference_state = sat_state.clone();
+    
+    let mut needs_recovery = false;
+    let recovery_config = RecoveryConfig::default();
+
     let my_fuel_percent = 85.0;
 
     let radar = RadarFilter::new(50000.0);
@@ -76,22 +83,32 @@ fn main() {
         // --- FASE 1: ORBITAL PROPAGATION & J2 PERTURBATION ---
         // Moving according to the real laws of physics, the earth is oval.
         let delta_t = 1.0 / TICK_RATE_HZ as f64;
-        let j2_accel = calculate_j2_perturbation(sat_state.position);
+	let ref_j2_accel = calculate_j2_perturbation(reference_state.position);
+	reference_state.velocity.x += ref_j2_accel.x * delta_t;
+        reference_state.velocity.y += ref_j2_accel.y * delta_t;
+        reference_state.velocity.z += ref_j2_accel.z * delta_t;
+        reference_state.propagate(delta_t);
+
+	let j2_accel = calculate_j2_perturbation(sat_state.position);
         sat_state.velocity.x += j2_accel.x * delta_t;
         sat_state.velocity.y += j2_accel.y * delta_t;
         sat_state.velocity.z += j2_accel.z * delta_t;
         sat_state.propagate(delta_t);
 
-        space_catalog[0].position.y += space_catalog[0].velocity.y * delta_t;
+	space_catalog[0].position.y += space_catalog[0].velocity.y * delta_t;
 
         // --- FASE 2: RADAR SCANNING ---
         let threats = radar.get_proximate_threats(&sat_state.position, &space_catalog);
 
-        // --- FASE 3: THREAT EVALUATION & AI SWARM COORDINATION ---
-        for threat in threats {
-            let assessment = assess_threat(&sat_state.position, &sat_state.velocity, &threat);
+        // --- FASE 3: THREAT EVALUATION, EVASION & RECOVERY ---
+        let mut current_threat_level = ThreatLevel::Clear;
+
+        for threat in &threats {
+            let assessment = assess_threat(&sat_state.position, &sat_state.velocity, threat);
 
             if assessment.level == ThreatLevel::Critical {
+                current_threat_level = ThreatLevel::Critical;
+
                 println!(
                     "\n[!] CRITICAL PROXIMITY ALERT! Collision in: {:.2}s",
                     assessment.tca_seconds
@@ -102,42 +119,71 @@ fn main() {
 
                 match identity {
                     TargetIdentity::VerifiedAlly => {
-                        let ally_fuel = 10.0;
-                        if negotiate_evasion(my_fuel_percent, ally_fuel) {
+                        if negotiate_evasion(my_fuel_percent, 10.0) {
                             let maneuver =
                                 compute_evasion_maneuver(&sat_state.position, &sat_state.velocity);
                             println!(
-                                " >> [SWARM] Give in to friends. Ignites maneuvering rockets: {:?}",
+                                " >> [SWARM] Giving in to a friend. Avoiding: {:?}",
                                 maneuver.delta_v
                             );
-                        } else {
-                            println!(" >> [SWARM] Friends who will maneuver. We are silent.");
+
+                            sat_state.velocity.x += maneuver.delta_v.x;
+                            sat_state.velocity.y += maneuver.delta_v.y;
+                            sat_state.velocity.z += maneuver.delta_v.z;
+                            needs_recovery = true;
                         }
                     }
-                    TargetIdentity::StandardInternational => {
+                    TargetIdentity::StandardInternational | TargetIdentity::UnknownDebris => {
                         let maneuver =
                             compute_evasion_maneuver(&sat_state.position, &sat_state.velocity);
                         println!(
-                            " >> [FOREIGN] Foreign / Spy Satellites. Evasive Mode: {:?}",
-                            maneuver.delta_v
-                        );
-                    }
-                    TargetIdentity::UnknownDebris => {
-                        let maneuver =
-                            compute_evasion_maneuver(&sat_state.position, &sat_state.velocity);
-                        println!(
-                            " >> [DEBRIS] SPACE DUST! Delta-V Execution Normal: {:?}",
+                            " >> [EVASION] Foreign Object/Debris! Delta-V Execution: {:?}",
                             maneuver.delta_v
                         );
 
-                        space_catalog[0].position.y = 9999999.0;
+                        sat_state.velocity.x += maneuver.delta_v.x;
+                        sat_state.velocity.y += maneuver.delta_v.y;
+                        sat_state.velocity.z += maneuver.delta_v.z;
+                        needs_recovery = true;
+
+                        if identity == TargetIdentity::UnknownDebris {
+                            space_catalog[0].position.y = 9999999.0;
+                        }
                     }
                 }
             }
         }
 
+        if current_threat_level != ThreatLevel::Critical && needs_recovery {
+            let recovery_burn = compute_recovery_maneuver(
+                &sat_state.position,
+                &sat_state.velocity,
+                &reference_state.position,
+                &reference_state.velocity,
+                &recovery_config,
+            );
+
+            sat_state.velocity.x += recovery_burn.delta_v.x;
+            sat_state.velocity.y += recovery_burn.delta_v.y;
+            sat_state.velocity.z += recovery_burn.delta_v.z;
+
+            let burn_magnitude = (recovery_burn.delta_v.x.powi(2)
+                + recovery_burn.delta_v.y.powi(2)
+                + recovery_burn.delta_v.z.powi(2))
+            .sqrt();
+            if burn_magnitude < 0.001 {
+                println!(" >> [NAV-SYS] Orbit Recovery Complete. Return to main task..");
+                needs_recovery = false;
+            } else {
+                println!(
+                    " >> [AOR] Thrust back to original orbit... Thrust: {:.5} m/s",
+                    burn_magnitude
+                );
+            }
+        }
+
         // --- FASE 4: TELEMETRY STREAMING ---
-        if mission_clock % TICK_RATE_HZ == 0 {
+        if mission_clock.is_multiple_of(TICK_RATE_HZ) {
             let seconds_online = mission_clock / TICK_RATE_HZ;
             println!(
                 "[T-PLUS: {:02}s] NAV-SYS: Pos(X:{:.1}, Y:{:.1}) | J2: COMPENSATED | LINK: SECURE",
@@ -148,7 +194,7 @@ fn main() {
                 CcsdsTelemetry::new(my_sat_id, &sat_state.position, &sat_state.velocity);
             let broadcast_string = ccsds_packet.encode_to_string();
 
-            println!("[PUBLIC TX] Memancarkan data CCSDS: {}", broadcast_string);
+            println!("[PUBLIC TX] Transmitting CCSDS data: {}", broadcast_string);
         }
 
         mission_clock += 1;
