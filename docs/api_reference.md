@@ -31,6 +31,12 @@ Validates incoming radio transmissions against the internal Sovereign Swarm roll
 * **Input:** `received_ping` (Intercepted 64-bit integer), `current_timestamp` (Epoch time).
 * **Return:** `TargetIdentity` enumeration (`VerifiedAlly`, `StandardInternational`, `UnknownDebris`).
 
+### `compute_recovery_maneuver(current_pos: &Vector3, current_vel: &Vector3, reference_pos: &Vector3, reference_vel: &Vector3, config: &RecoveryConfig) -> ManeuverVector`
+Calculates the required Delta-V to close the spatial and velocity gap between the satellite and its reference orbit.
+* **Input:** Current state vectors, reference target vectors, and tuning parameters (`RecoveryConfig`).
+* **Logic:** Utilizes PD (Proportional-Derivative) control logic to ensure zero-overshoot soft landings back to the orbital path.
+* **Return:** `ManeuverVector` capped by the `max_delta_v` threshold to ensure fuel preservation.
+
 ## 3. Telemetry Module (`src/telemetry/`)
 
 ### `parse_incoming_data(raw_data: &[u8]) -> Option<TelemetryPacket>`

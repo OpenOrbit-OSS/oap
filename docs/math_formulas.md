@@ -35,3 +35,18 @@ To maximize Delta-V efficiency, the evasion thrust vector ($\mathbf{n}$) is calc
 $$\mathbf{n} = \frac{\mathbf{r} \times \mathbf{v}}{|\mathbf{r} \times \mathbf{v}|}$$
 
 This ensures the applied thrust alters the orbital trajectory without drastically affecting the semi-major axis or orbital velocity profile.
+
+## 5. Adaptive Orbit Recovery (PD Control)
+To return the satellite to its baseline orbit without overshooting or depleting fuel reserves, the system calculates a recovery thrust vector ($\Delta \mathbf{v}_{rec}$) using a Proportional-Derivative (PD) controller:
+
+$$\Delta \mathbf{v}_{rec} = (K_p \cdot \mathbf{e}_{pos}) + (K_d \cdot \mathbf{e}_{vel})$$
+
+Where:
+* $K_p$: Proportional gain coefficient (pulls the satellite to the target position).
+* $K_d$: Derivative gain coefficient (dampens the velocity to prevent overshoot).
+* $\mathbf{e}_{pos}$: Position error vector ($\mathbf{r}_{ref} - \mathbf{r}_{curr}$).
+* $\mathbf{e}_{vel}$: Velocity error vector ($\mathbf{v}_{ref} - \mathbf{v}_{curr}$).
+
+**Fuel Clamping (Vector Normalization):**
+To ensure safety, the requested Delta-V is clamped to a maximum hardware threshold ($V_{max}$). If $|\Delta \mathbf{v}_{rec}| > V_{max}$, the vector is scaled:
+$$\Delta \mathbf{v}_{safe} = \Delta \mathbf{v}_{rec} \frac{V_{max}}{|\Delta \mathbf{v}_{rec}|}$$

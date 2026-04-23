@@ -1,6 +1,6 @@
 # Orbital Analysis Pro (OAP)
 **High-Performance Satellite Monitoring and Autonomous Collision Avoidance System**
-**Version:** 1.0 (Sovereign Command Edition)
+**Version:** 1.1.0 (Sovereign Command - AOR INTEGRATED)
 
 ## 1. Overview
 Orbital Analysis Pro (OAP) is a specialized, sovereign-grade software suite designed for real-time satellite trajectory propagation and autonomous conjunction assessment. Developed with a strict focus on high-fidelity orbital mechanics, cryptographic security, and minimal computational overhead, OAP serves as an onboard autonomous guardian for national satellite assets.
@@ -13,6 +13,7 @@ The system is highly optimized for deployment on resource-constrained On-Board C
 * **Sovereign Swarm Protocol:** Employs Time-based XOR Hashing (Rolling Code) for secure inter-satellite handshake protocols, ensuring resilience against foreign signal spoofing and facilitating swarm intelligence negotiation.
 * **Aerospace-Grade Failsafes:** Features a native panic-handling architecture that logs diagnostic data to a black box and transmits high-gain SOS signals upon detection of logic anomalies or radiation-induced bit flips.
 * **Tactical Command Dashboard:** WebGL-accelerated, responsive 3D visualization and equatorial radar tracking for real-time situational awareness at Ground Control.
+* **Adaptive Orbit Recovery (AOR):** Autonomously guides the satellite back to its reference orbital trajectory post-evasion using an integrated Proportional-Derivative (PD) controller, featuring a strict fuel-clamping mechanism to prevent propellant exhaustion.
 
 ## 3. System Architecture
 The project follows a strict modular design ensuring scalability, memory safety, and domain isolation:

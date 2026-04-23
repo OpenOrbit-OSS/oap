@@ -8,11 +8,12 @@ Orbital Analysis Pro (OAP) is a mission-critical, modular software system engine
 ### 2.1 Physics & Gravity Engine (Level 0)
 The foundational layer handling astrodynamics, state propagation, and J2 anomaly corrections. Written entirely in Rust to guarantee memory safety and eliminate garbage collection delays. Frame limiters ensure computational loads do not exceed hardware thermal capacities.
 
-### 2.2 Autonomous Defense & Cryptography (Level 1)
-A dual-purpose subsystem acting as the logical brain of the satellite:
+### 2.2 Autonomous Defense, Navigation & Cryptography (Level 1)
+A multi-purpose subsystem acting as the logical brain of the satellite:
 * **Spatial Radar Filter:** Scans and tracks thousands of space objects within the predefined radar sphere.
 * **TCA Analyzer:** Predicts absolute collision timelines mathematically.
-* **Sovereign Swarm Protocol:** Evaluates target identity via high-speed, Time-based XOR Hashing. Manages multi-satellite fuel negotiation to orchestrate cooperative evasion maneuvers among allied assets.
+* **Sovereign Swarm Protocol:** Evaluates target identity via high-speed, Time-based XOR Hashing. Manages multi-satellite fuel negotiation.
+* **Adaptive Orbit Recovery (AOR):** Intelligently navigates the satellite back to its assigned orbital corridor post-anomaly using bounded PD-control thrusts.
 
 ### 2.3 Telemetry & Failsafe Controller (Level 2)
 The communication bridge parsing raw binary packets from ground stations and hardware sensors. Features an Aerospace-Grade Panic Handler capable of intercepting critical logic failures, dumping diagnostic data to a black box, and transmitting SOS signals independently of the main thread.
