@@ -44,8 +44,26 @@ cargo test --test coordination_test
 cargo run --release
 ```
 
-## 6. Licensing
+## 6. Automation Scripts
+We provide several utility scripts to streamline development and mission control operations. All scripts are located in the `scripts/` directory and should be executed from the project root.
 
+### 6.1 Diagnostic suite
+Before pushing any code or initiating a mission, run the diagnostic suite to ensure code quality and memory safety:
+```bash
+./scripts/run_diagnostics.sh
+```
+*This script checks the Rust toolchain, runs unit tests for orbital mechanics, and performs a deep linting check.*
+
+### 6.2 Launching the Dashboard
+Since the dashboard is a sovereign-grade interface, we recommend running it via a local web server to bypass browser CORS restrictions and ensure smooth 3D rendering:
+```bash
+./scripts/launch_dashboard.sh
+```
+Once executed, access the visualizer at: `http://localhost:8000`
+
+**Note**: Ensure you have granted execution permissions to the scripts: `chmod +x scripts/*.sh`
+
+## 7. Licensing
 This project is licensed under the **Apache License, Version 2.0** (the "License").
 You may obtain a copy of the License at:
 
