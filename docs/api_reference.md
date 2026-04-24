@@ -45,3 +45,9 @@ Safely decodes binary streams from ground stations.
 
 ### `send_sos()`
 Constructs and dispatches a high-priority hexadecimal distress signal (`0xFF, 0x53, 0x4F, 0x53, 0xAA`) directly to the hardware transmitter buffer. Triggered autonomously by the panic hook system.
+
+### `health::FdirController`
+The core diagnostic engine responsible for Fault Detection, Isolation, and Recovery (FDIR).
+* **`run_diagnostics(&mut self, pos_x: f64, pos_y: f64, pos_z: f64, fuel_level: f64)`:** Executes a continuous health check on vital satellite systems. Checks include Memory Integrity (`NaN`/infinite vector validation), LEO Hard-Deck limits (altitude > Earth Radius + 150km), and Fuel Anomalies.
+* **`evaluate_system_health(&mut self)`:** Evaluates current subsystem states (`Nominal`, `Warning`, `Critical`, `Isolated`) and triggers isolation protocols, such as electrically isolating the radar system to conserve battery if it becomes critical.
+* **`engage_safe_mode(&mut self)`:** Autonomously shuts down non-essential systems, disables thrusters, and broadcasts an emergency SOS packet (`0xFF, 0x53, 0x4F, 0x53, 0xAA`) when `nav_system` reaches a `Critical` state.

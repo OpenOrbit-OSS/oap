@@ -26,8 +26,7 @@ pub fn encode_maneuver_command(plan: &ManeuverVector) -> Vec<u8> {
 pub fn transmit_command(command_bytes: &[u8]) {
     // In a real environment, this sends data via UART, CAN bus, or SpaceWire.
     // We use a silent return to keep CPU cycles strictly minimal during flight.
-    if command_bytes.is_empty() {
-    }
+    if command_bytes.is_empty() {}
 
     // System call to hardware would go here.
 }

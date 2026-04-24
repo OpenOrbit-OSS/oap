@@ -17,6 +17,7 @@ A multi-purpose subsystem acting as the logical brain of the satellite:
 
 ### 2.3 Telemetry & Failsafe Controller (Level 2)
 The communication bridge parsing raw binary packets from ground stations and hardware sensors. Features an Aerospace-Grade Panic Handler capable of intercepting critical logic failures, dumping diagnostic data to a black box, and transmitting SOS signals independently of the main thread.
+* **FDIR (Fault Detection, Isolation, and Recovery) Controller:** Evaluates subsystem states (Nominal, Warning, Critical, Isolated) at a highly determinictic 60hz tick rate. It actively monitors memory integrity for `NaN`/infinite value, ensures the satellite stays above teh LSO hard-deck threshold, and tracks fuel pressure. Upon critical failure, it automatically triggers Safe Mode, isolating power-heavy components like radar and taking thrusters offlien to await Ground Control Instructions.
 
 ### 2.4 Command Center UI (Level 3 - Ground Segment)
 A zero-installation, browser-based monitoring dashboard utilizing WebGL and Canvas technologies. Provides real-time 3D orbital visualization, equatorial radar mapping, and live telemetry log streaming wrapped in a tactical, high-contrast user interface.

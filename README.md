@@ -14,6 +14,7 @@ The system is highly optimized for deployment on resource-constrained On-Board C
 * **Aerospace-Grade Failsafes:** Features a native panic-handling architecture that logs diagnostic data to a black box and transmits high-gain SOS signals upon detection of logic anomalies or radiation-induced bit flips.
 * **Tactical Command Dashboard:** WebGL-accelerated, responsive 3D visualization and equatorial radar tracking for real-time situational awareness at Ground Control.
 * **Adaptive Orbit Recovery (AOR):** Autonomously guides the satellite back to its reference orbital trajectory post-evasion using an integrated Proportional-Derivative (PD) controller, featuring a strict fuel-clamping mechanism to prevent propellant exhaustion.
+* **FDIR (Fault Detection, Isolation, and Recovery):** Continuous onboard diagnostic system (running at 60Hz) that monitors memory integrity, orbital altitude (LEO hard-deck), and fuel anomalies. It automatically engages Safe Mode and hardware isolation to prevent catastrophic failures and preserve battery life.
 
 ## 3. System Architecture
 The project follows a strict modular design ensuring scalability, memory safety, and domain isolation:
