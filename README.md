@@ -21,7 +21,6 @@ The project follows a strict modular design ensuring scalability, memory safety,
 * `src/engine/`: Core astrodynamics, deterministic propagation, and gravitational anomaly modeling.
 * `src/collision/`: Threat evaluation, radar spatial filtering, evasive maneuver planning, and cryptographic swarm coordination.
 * `src/telemetry/`: Hardware-level binary command encoding, asynchronous data parsing, and emergency transmission.
-* `dashboard_ui/`: Glassmorphism-styled, responsive mission control interface utilizing Three.js and Canvas 2D.
 * `tests/`: High-coverage, extreme-scenario integration and unit testing suite.
 
 ## 4. Installation and Deployment
@@ -55,13 +54,6 @@ Before pushing any code or initiating a mission, run the diagnostic suite to ens
 ./scripts/run_diagnostics.sh
 ```
 *This script checks the Rust toolchain, runs unit tests for orbital mechanics, and performs a deep linting check.*
-
-### 6.2 Launching the Dashboard
-Since the dashboard is a sovereign-grade interface, we recommend running it via a local web server to bypass browser CORS restrictions and ensure smooth 3D rendering:
-```bash
-./scripts/launch_dashboard.sh
-```
-Once executed, access the visualizer at: `http://localhost:8000`
 
 **Note**: Ensure you have granted execution permissions to the scripts: `chmod +x scripts/*.sh`
 
