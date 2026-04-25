@@ -1,5 +1,5 @@
 // OAP/src/main.rs
-// Core Entry Point - Orbital Analysis Pro (V1.2.0 - Sovereign Edition with FDIR)
+// Core Entry Point - Orbital Analysis Pro (V1.3.0 - Sovereign Edition - Core Purist)
 
 use std::panic;
 use std::time::{Duration, Instant};

@@ -1,6 +1,6 @@
 # Orbital Analysis Pro (OAP)
 **High-Performance Satellite Monitoring and Autonomous Collision Avoidance System**
-**Version:** 1.2.0 (Sovereign Command - FDIR INTEGRATED)
+**Version:** 1.3.0 (Sovereign Command - Core Purist)
 
 ## 1. Overview
 Orbital Analysis Pro (OAP) is a specialized, sovereign-grade software suite designed for real-time satellite trajectory propagation and autonomous conjunction assessment. Developed with a strict focus on high-fidelity orbital mechanics, cryptographic security, and minimal computational overhead, OAP serves as an onboard autonomous guardian for national satellite assets.
