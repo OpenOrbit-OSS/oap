@@ -43,7 +43,7 @@ impl OapCryptoCore {
 
 /// Swarm Intelligence negotiation function
 /// Determine who should shift based on remaining fuel.
-pub fn negotiate_evasion(my_fuel_percent: f32, ally_fuel_percent: f32) -> bool {
+pub fn negotiate_evasion(my_fuel_percent: f64, ally_fuel_percent: f64) -> bool {
     // If we have more fuel, WE will give in and maneuver.
     // If we have less fuel, our satellites will give in.
     my_fuel_percent > ally_fuel_percent

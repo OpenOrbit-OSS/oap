@@ -1,14 +1,12 @@
 // OAP/src/telemetry/health.rs
 // Fault Detection, Isolation, and Recovery (FDIR) Module
 
-use crate::engine::orbital_mechanics::{OrbitalState, Vector3};
-
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum SubsystemState {
-    Nominal,        //  Walk perfectly
-    Warning,        // There is a slight anomaly, it needs to be
-    Critical,       // Severe damage
-    Isolated,       // Forced shutdown to prevent infection in the system
+    Nominal,  //  Walk perfectly
+    Warning,  // There is a slight anomaly, it needs to be
+    Critical, // Severe damage
+    Isolated, // Forced shutdown to prevent infection in the system
 }
 
 #[derive(Debug)]
@@ -76,7 +74,7 @@ impl FdirController {
         if !self.is_safe_mode_active {
             self.is_safe_mode_active = true;
             self.radar_system = SubsystemState::Isolated; // Matikan radar untuk hemat daya
-            
+
             self.broadcast_sos();
         }
     }
@@ -84,6 +82,9 @@ impl FdirController {
     /// Internal function to trigger transmission hardware
     fn broadcast_sos(&self) {
         let sos_packet: [u8; 5] = [0xFF, 0x53, 0x4F, 0x53, 0xAA];
-        println!("[CRITICAL] SAFE MODE ENGAGED. Broadcasting SOS: {:X?}", sos_packet);
+        println!(
+            "[CRITICAL] SAFE MODE ENGAGED. Broadcasting SOS: {:X?}",
+            sos_packet
+        );
     }
 }

@@ -11,8 +11,8 @@ use oap::collision::recovery::{compute_recovery_maneuver, RecoveryConfig};
 use oap::collision::threat_eval::{assess_threat, ThreatLevel};
 use oap::engine::gravity_model::calculate_j2_perturbation;
 use oap::engine::orbital_mechanics::{OrbitalState, Vector3, EARTH_RADIUS};
-use oap::telemetry::public_boardcast::CcsdsTelemetry;
-use oap::telemetry::health::FdirController; // <-- FDIR IMPORTED
+use oap::telemetry::health::FdirController;
+use oap::telemetry::public_boardcast::CcsdsTelemetry; // <-- FDIR IMPORTED
 
 // Thermal Control & Tick Rate: OAP runs at 60 Calculations per second.
 const TICK_RATE_HZ: u64 = 60;
@@ -23,7 +23,9 @@ fn main() {
     panic::set_hook(Box::new(|info| {
         eprintln!("\n[CRITICAL FAIL] OAP System Anomaly Detected!");
         eprintln!("Detail Error: {:?}", info);
-        eprintln!("[AUTO-RECOVERY] Activating Emergency Mode & Transmitting SOS to Ground Station...");
+        eprintln!(
+            "[AUTO-RECOVERY] Activating Emergency Mode & Transmitting SOS to Ground Station..."
+        );
         oap::telemetry::transmitter::send_sos();
     }));
 
@@ -52,11 +54,11 @@ fn main() {
     let recovery_config = RecoveryConfig::default();
 
     // Changed to mutable so fuel can be consumed during maneuvers
-    let mut my_fuel_percent = 85.0; 
+    let mut my_fuel_percent = 85.0;
 
     let radar = RadarFilter::new(50000.0);
     let crypto_core = OapCryptoCore::new(0x123456789ABCDEF0);
-    
+
     // Initializing the FDIR Controller (Satellite Doctor)
     let mut fdir = FdirController::new();
 
@@ -107,7 +109,12 @@ fn main() {
 
         // --- PHASE 1.6: SYSTEM DIAGNOSTICS (FDIR) ---
         // The doctor checks vital signs every frame (60 times per second)
-        fdir.run_diagnostics(sat_state.position.x, sat_state.position.y, sat_state.position.z, my_fuel_percent);
+        fdir.run_diagnostics(
+            sat_state.position.x,
+            sat_state.position.y,
+            sat_state.position.z,
+            my_fuel_percent,
+        );
 
         // If the satellite enters Safe Mode, disable radar and maneuvers
         if fdir.is_safe_mode_active {
@@ -139,9 +146,15 @@ fn main() {
                     match identity {
                         TargetIdentity::VerifiedAlly => {
                             if negotiate_evasion(my_fuel_percent, 10.0) {
-                                let maneuver = compute_evasion_maneuver(&sat_state.position, &sat_state.velocity);
-                                println!(" >> [SWARM] Giving in to a friend. Avoiding: {:?}", maneuver.delta_v);
-                                
+                                let maneuver = compute_evasion_maneuver(
+                                    &sat_state.position,
+                                    &sat_state.velocity,
+                                );
+                                println!(
+                                    " >> [SWARM] Giving in to a friend. Avoiding: {:?}",
+                                    maneuver.delta_v
+                                );
+
                                 sat_state.velocity.x += maneuver.delta_v.x;
                                 sat_state.velocity.y += maneuver.delta_v.y;
                                 sat_state.velocity.z += maneuver.delta_v.z;
@@ -150,8 +163,12 @@ fn main() {
                             }
                         }
                         TargetIdentity::StandardInternational | TargetIdentity::UnknownDebris => {
-                            let maneuver = compute_evasion_maneuver(&sat_state.position, &sat_state.velocity);
-                            println!(" >> [EVASION] Foreign Object/Debris! Delta-V Execution: {:?}", maneuver.delta_v);
+                            let maneuver =
+                                compute_evasion_maneuver(&sat_state.position, &sat_state.velocity);
+                            println!(
+                                " >> [EVASION] Foreign Object/Debris! Delta-V Execution: {:?}",
+                                maneuver.delta_v
+                            );
 
                             sat_state.velocity.x += maneuver.delta_v.x;
                             sat_state.velocity.y += maneuver.delta_v.y;
@@ -169,7 +186,8 @@ fn main() {
 
             if current_threat_level != ThreatLevel::Critical && needs_recovery {
                 let recovery_burn = compute_recovery_maneuver(
-                    &sat_state.position, &sat_state.velocity,
+                    &sat_state.position,
+                    &sat_state.velocity,
                     &reference_state.position, // Return to reference target
                     &reference_state.velocity,
                     &recovery_config,
@@ -180,12 +198,18 @@ fn main() {
                 sat_state.velocity.z += recovery_burn.delta_v.z;
                 my_fuel_percent -= 0.1; // Micro-burn fuel consumption for AOR
 
-                let burn_magnitude = (recovery_burn.delta_v.x.powi(2) + recovery_burn.delta_v.y.powi(2) + recovery_burn.delta_v.z.powi(2)).sqrt();
+                let burn_magnitude = (recovery_burn.delta_v.x.powi(2)
+                    + recovery_burn.delta_v.y.powi(2)
+                    + recovery_burn.delta_v.z.powi(2))
+                .sqrt();
                 if burn_magnitude < 0.001 {
                     println!(" >> [NAV-SYS] Orbit Recovery Complete. Return to main task..");
                     needs_recovery = false;
                 } else {
-                    println!(" >> [AOR] Thrust back to original orbit... Thrust: {:.5} m/s", burn_magnitude);
+                    println!(
+                        " >> [AOR] Thrust back to original orbit... Thrust: {:.5} m/s",
+                        burn_magnitude
+                    );
                 }
             }
         }
@@ -193,16 +217,24 @@ fn main() {
         // --- PHASE 4: TELEMETRY STREAMING ---
         if mission_clock.is_multiple_of(TICK_RATE_HZ) {
             let seconds_online = mission_clock / TICK_RATE_HZ;
-            let fdir_status = if fdir.is_safe_mode_active { "SAFE-MODE" } else { "NOMINAL" };
+            let fdir_status = if fdir.is_safe_mode_active {
+                "SAFE-MODE"
+            } else {
+                "NOMINAL"
+            };
 
             println!(
                 "[T-PLUS: {:02}s] NAV: Pos(X:{:.1}) | SYS: {} | FUEL: {:.1}% | SECURE",
                 seconds_online, sat_state.position.x, fdir_status, my_fuel_percent
             );
-            
+
             let my_sat_id = "ID-OAP-001";
-            let ccsds_packet = CcsdsTelemetry::new(my_sat_id, &sat_state.position, &sat_state.velocity);
-            println!("[PUBLIC TX] Broadcasting CCSDS data: {}", ccsds_packet.encode_to_string());
+            let ccsds_packet =
+                CcsdsTelemetry::new(my_sat_id, &sat_state.position, &sat_state.velocity);
+            println!(
+                "[PUBLIC TX] Broadcasting CCSDS data: {}",
+                ccsds_packet.encode_to_string()
+            );
         }
 
         mission_clock += 1;
